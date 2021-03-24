@@ -98,10 +98,32 @@ namespace SamoletniRezervacii.Areas.Identity.Pages.Account
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
             if (ModelState.IsValid)
             {
-                var user = new AppUser { UserName = Input.Email, Email = Input.Email };
+                //Допълваме модела с полетата Telefon,Role....
+                var user = new AppUser 
+                { UserName = Input.Email, 
+                    Email = Input.Email,
+                    PhoneNumber=Input.Telefon,
+                    UserRole=Input.UserRole,
+                    FirstName=Input.FirstName,
+                    LastName=Input.LastName,
+                    Address=Input.Address,
+                    Egn=Input.EGN
+                    
+                };
                 var result = await _userManager.CreateAsync(user, Input.Password);
                 if (result.Succeeded)
-                {
+                {    //Тук добавяме потребителя към роля: Admin,Employee
+                    var role = await this._roleManager.FindByNameAsync(Input.UserRole);
+                    if (role!=null)
+                    {
+                        await this._userManager.AddToRoleAsync(user, Input.UserRole);
+                    }
+                    else
+                    {
+                        await this._roleManager.CreateAsync(new AppRole() { Name=Input.UserRole});
+                        await this._userManager.AddToRoleAsync(user, Input.UserRole);
+                    }
+                    //end user role!!!
                     _logger.LogInformation("User created a new account with password.");
 
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);

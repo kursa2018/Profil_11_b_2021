@@ -38,6 +38,7 @@ namespace SamoletniRezervacii
                 options.Password.RequireLowercase = false;
                 options.Password.RequiredUniqueChars = 0;
                 options.Password.RequireUppercase = false;
+                
             }).AddRoles<AppRole>()
               .AddEntityFrameworkStores<ApplicationDbContext>();
             services.AddRazorPages();
